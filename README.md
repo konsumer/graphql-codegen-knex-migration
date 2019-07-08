@@ -2,11 +2,11 @@
 
 # WORK IN PROGRESS
 
-## usage
-
 This will allow you to generate database migrations to setup [knex](https://knexjs.org/) with [graphql-code-generator](https://graphql-code-generator.com/).
 
 You can use this to create your data-store, and eventually I will have a resolver-generator, too that will work with it.
+
+## usage
 
 There are some custom schema-directives you can use:
 
@@ -91,7 +91,7 @@ exports.down = async db => {
 ```
 
 
-### links
+### relationships
 
 You can link fields with the `@link` directive, and it will detect if there is many-to-many (both are arrays) or one-to-many (this one is single, other one is array) or many-to-one (other is not array, but this one is.)
 
