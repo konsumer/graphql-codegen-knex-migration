@@ -38,7 +38,7 @@ type User @db {
   name: String @nodb
 
   # if Post is also using @db, this will be a link between `User.id` and `Post.id` via the `Post.author` field
-  posts: [ Post ]! @link('author')
+  posts: [ Post ]! @link(field: "author")
 }
 
 type Post @db {
