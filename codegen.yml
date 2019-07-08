@@ -1,4 +1,5 @@
 schema: ./example/**/*.graphql
 generates:
   migrations/0_generated.js:
-    - ./index.js
+    plugins:
+      - ./index.js
