@@ -13,6 +13,8 @@ directive @db(table: String, key: String) on OBJECT
 directive @nodb on FIELD | FIELD_DEFINITION
 ```
 
+You may want to add then to your own definitions, so your GraphQL doesn't throw any errors.
+
 Use them like this:
 
 ```graphql
