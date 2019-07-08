@@ -106,6 +106,8 @@ You will need to make your own type-resolvers. I recommend [graphql-type-json](h
 
 Arrays of scalars will use JSON-type in the database.
 
+`ID` types will be stored as `UUID` in the database, to keep primary-keys unique across tables.
+
 ## development
 
 * You can install tools & deps with `npm i`
