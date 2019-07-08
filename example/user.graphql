@@ -1,0 +1,19 @@
+type User @db {
+  # the first ID! field is the default key, and will be id field in the database
+  id: ID!
+  
+  # this will be a an email field in the database
+  email: String!
+
+  # this will be a first_name field in the database
+  firstName: String
+  
+  # this will be a last_name field in the database
+  lastName: String
+  
+  # this will not be a field in the database (resolver-only)
+  name: String @nodb
+
+  # if Post is also using @db, this will be a link table between User.id and Post.id
+  posts: [ Post ]!
+}

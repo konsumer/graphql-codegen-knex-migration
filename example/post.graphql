@@ -1,0 +1,6 @@
+type Post @db {
+  id: ID!
+  title: String!
+  body: String!
+  author: User!
+}
