@@ -57,7 +57,7 @@ schema: ./schema/**/*.graphql
 generates:
   migrations/0_generated.js:
     plugins:
-      - ./index.js
+      - graphql-codegen-knex-migration
 ```
 
 When you run `graphql-codegen`, you will get something that looks like this:
