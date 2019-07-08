@@ -2,6 +2,8 @@
 
 # WORK IN PROGRESS
 
+## usage
+
 This will allow you to generate database migrations to setup [knex](https://knexjs.org/) with [graphql-code-generator](https://graphql-code-generator.com/).
 
 You can use this to create your data-store, and eventually I will have a resolver-generator, too that will work with it.
@@ -11,6 +13,7 @@ There are some custom schema-directives you can use:
 ```graphql
 directive @db(table: String, key: String) on OBJECT
 directive @nodb on FIELD | FIELD_DEFINITION
+directive @link(field: String) on FIELD | FIELD_DEFINITION
 ```
 
 You may want to add then to your own definitions, so your GraphQL doesn't throw any errors.
@@ -19,25 +22,65 @@ Use them like this:
 
 ```graphql
 type User @db {
-  # the first ID! field is the default key, and will be id field in the database
+  # the first ID! field is the default key, and will be `id` field in the database
   id: ID!
   
-  # this will be a an email field in the database
+  # this will be a an `email` field in the database
   email: String!
 
-  # this will be a first_name field in the database
+  # this will be a `first_name` field in the database
   firstName: String
   
-  # this will be a last_name field in the database
+  # this will be a `last_name` field in the database
   lastName: String
   
   # this will not be a field in the database (resolver-only)
   name: String @nodb
 
-  # if Post is also using @db, this will be a link table between User.id and Post.id
-  posts: [ Post ]!
+  # if Post is also using @db, this will be a link between `User.id` and `Post.id` via the `Post.author` field
+  posts: [ Post ]! @link('author')
 }
+
+type Post @db {
+  id: ID!
+  title: String!
+  body: String!
+  author: User!
+}
+
 ```
+
+Add it to your `codegen.yml` like this:
+
+```yml
+schema: ./schema/**/*.graphql
+generates:
+  migrations/0_generated.js:
+    plugins:
+      - ./index.js
+```
+
+### links
+
+You can link fields with the `@link` directive, and it will detect if there is many-to-many (both are arrays) or one-to-many (this one is single, other one is array) or many-to-one (other is not array, but this one is.)
+
+If it is many-to-many, a seperate table will be used to join them, otherwise a field on the `one` table will be used. In the above example, `Post.author` field will be used to join the tables, because it's the `one` and `posts` is the `many` field in the join.
+
+
+### special scalar types
+
+If you use custom scalar-types that have these names, appropriate field-type:
+
+```
+Date
+DateTime
+Time
+JSON
+```
+
+You will need to make your own type-resolvers. I recommend [graphql-type-json](https://www.npmjs.com/package/graphql-type-json) and [graphql-iso-date](https://www.npmjs.com/package/graphql-iso-date).
+
+Arrays of scalars will use JSON-type in the database.
 
 ## development
 
