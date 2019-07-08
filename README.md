@@ -93,7 +93,7 @@ If it is many-to-many, a seperate table will be used to join them, otherwise a f
 
 ### special scalar types
 
-If you use custom scalar-types that have these names, appropriate field-type:
+If you use custom scalar-types that have these names, an appropriate database field-type will be used:
 
 ```
 Date
