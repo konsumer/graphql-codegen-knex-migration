@@ -26,7 +26,11 @@
   },
   "homepage": "https://github.com/konsumer/graphql-codegen-knex-migration#readme",
   "devDependencies": {
-    "@graphql-codegen/cli": "1.3.1-alpha-991b9d78.75",
-    "graphql": "latest"
+    "@graphql-codegen/cli": "1.3.1-alpha-991b9d78.75"
+  },
+  "dependencies": {
+    "graphql": "latest",
+    "graphql-toolkit": "latest",
+    "inflection": "^1.12.0"
   }
 }

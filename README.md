@@ -71,13 +71,13 @@ When you run `graphql-codegen`, you will get something that looks like this:
 
 ```js
 exports.up = async db => {
-  await db.schema.createTable('user', t => {
+  await db.schema.createTable('users', t => {
     t.uuid('id').notNullable().primary()
     t.string('email').notNull()
     t.string('first_name').notNull()
     t.string('last_name').notNull()
   })
-  await db.schema.createTable('post', t => {
+  await db.schema.createTable('posts', t => {
     t.uuid('id').notNullable().primary()
     t.string('title').notNull()
     t.string('body').notNull()
@@ -85,8 +85,8 @@ exports.up = async db => {
   })
 }
 exports.down = async db => {
-  await db.schema.dropTable('user')
-  await db.schema.dropTable('post')
+  await db.schema.dropTable('users')
+  await db.schema.dropTable('posts')
 }
 ```
 
