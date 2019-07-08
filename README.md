@@ -60,6 +60,30 @@ generates:
       - ./index.js
 ```
 
+When you run `graphql-codegen`, you will get something that looks like this:
+
+```js
+exports.up = async db => {
+  await db.schema.createTable('user', t => {
+    t.uuid('id').notNullable().primary()
+    t.string('email').notNull()
+    t.string('first_name').notNull()
+    t.string('last_name').notNull()
+  })
+  await db.schema.createTable('post', t => {
+    t.uuid('id').notNullable().primary()
+    t.string('title').notNull()
+    t.string('body').notNull()
+    t.foreign('author').references('id').inTable('user');
+  })
+}
+exports.down = async db => {
+  await db.schema.dropTable('user')
+  await db.schema.dropTable('post')
+}
+```
+
+
 ### links
 
 You can link fields with the `@link` directive, and it will detect if there is many-to-many (both are arrays) or one-to-many (this one is single, other one is array) or many-to-one (other is not array, but this one is.)
