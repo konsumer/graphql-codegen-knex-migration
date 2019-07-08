@@ -2,7 +2,10 @@
   "name": "graphql-codegen-knex-migration",
   "version": "0.0.0",
   "description": "Generate knex migration from graphql",
-  "files": ["index.js"],
+  "files": [
+    "main/index.js"
+  ],
+  "main": "src/index.js",
   "scripts": {
     "test": "graphql-codegen"
   },

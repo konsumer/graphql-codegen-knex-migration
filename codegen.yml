@@ -4,4 +4,4 @@ schema: ./example/**/*.graphql
 generates:
   migrations/0_generated.js:
     plugins:
-      - ./index.js
+      - ./src/index.js
