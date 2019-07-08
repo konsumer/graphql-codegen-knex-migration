@@ -1,3 +1,5 @@
+# this is an example codegen.yml
+
 schema: ./example/**/*.graphql
 generates:
   migrations/0_generated.js:
