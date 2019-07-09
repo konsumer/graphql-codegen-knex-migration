@@ -43,7 +43,6 @@ module.exports = {
         tables.push(node.name.value)
         const fields = []
         let primary
-        // TODO: use db.table arg
         node.fields.forEach(f => {
           const directives = {}
           f.directives.forEach(d => {
@@ -65,7 +64,6 @@ module.exports = {
                 if (required) {
                   out += '.notNull()'
                 }
-                // TODO: use db.key arg
                 if (!primary && name === 'ID') {
                   primary = f.name.value
                   out += '.primary()'
@@ -107,7 +105,7 @@ module.exports = {
     `
   },
   addToSchema: `
-    directive @db(table: String, key: String) on OBJECT
+    directive @db on OBJECT
     directive @nodb on FIELD | FIELD_DEFINITION
     directive @link(field: String!) on FIELD | FIELD_DEFINITION
   `

@@ -11,9 +11,14 @@ You can use this to create your data-store, and eventually I will have a resolve
 There are some custom schema-directives you can use:
 
 ```graphql
-directive @db(table: String, key: String) on OBJECT
+# set a type as a database-model
+directive @db on OBJECT
+
+# leave a field out of the database (resolver-only)
 directive @nodb on FIELD | FIELD_DEFINITION
-directive @link(field: String) on FIELD | FIELD_DEFINITION
+
+# link to another table's field for relation
+directive @link(field: String!) on FIELD | FIELD_DEFINITION
 ```
 
 You may want to add then to your own definitions, so your GraphQL doesn't throw any errors.
@@ -56,6 +61,8 @@ type Post @db {
 }
 
 ```
+
+Make sure you've got `id: ID!` on all your `@db` types.
 
 Add it to your `codegen.yml` like this:
 
@@ -122,7 +129,7 @@ You will need to make your own type-resolvers. I recommend [graphql-type-json](h
 
 Arrays of scalars will use JSON-type in the database.
 
-`ID` types will be stored as `UUID` in the database, to keep primary-keys unique across tables.
+`ID` types will be stored as `UUID` in the database, to keep keys unique across tables.
 
 ## development
 
