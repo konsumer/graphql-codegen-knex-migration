@@ -73,6 +73,7 @@ module.exports = {
               fields.push(out)
             } else {
               // handle foreign-field
+              // TODO: detect if this is 1-to-many, many-to-1, or many-to-many
               if (directives.link) {
                 const otherTable = tableize(underscore(getField(schema._typeMap[name]._fields[directives.link.field].astNode.type).name))
                 const tk = tableize(underscore(name))
