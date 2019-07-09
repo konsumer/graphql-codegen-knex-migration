@@ -32,8 +32,11 @@ const getField = (type, info = { required: false, array: false }) => {
 module.exports = {
   plugin: (schema, documents, config) => {
     const tables = []
+    const links = {}
     const visitor = {
       ObjectTypeDefinition: node => {
+        const tableName = tableize(underscore(node.name.value))
+        // ignore non-db types
         if (!node.directives.find(d => d.name.value === 'db')) {
           return null
         }
@@ -43,14 +46,14 @@ module.exports = {
         // TODO: use db.table arg
         node.fields.forEach(f => {
           const directives = {}
-
           f.directives.forEach(d => {
             directives[d.name.value] = {}
             d.arguments.forEach(a => {
               directives[d.name.value][a.name.value] = a.value.value
             })
           })
-          if (Object.keys(directives).indexOf('nodb') === -1) {
+
+          if (!directives.nodb) {
             const { name, array, required } = getField(f.type)
             if (typeMap[name]) {
               // regular scalar type
@@ -70,24 +73,32 @@ module.exports = {
               fields.push(out)
             } else {
               // handle foreign-field
-              if (Object.keys(directives).indexOf('link') !== -1) {
-
+              if (directives.link) {
+                const otherTable = tableize(underscore(getField(schema._typeMap[name]._fields[directives.link.field].astNode.type).name))
+                const tk = tableize(underscore(name))
+                if (!links[tk]) {
+                  links[tk] = []
+                }
+                links[tk].push({ link: directives.link, field: f, name: otherTable, array, required })
               }
             }
           }
         })
-        // handle relationships
-        return `
-        await db.schema.createTable('${tableize(underscore(node.name.value))}', t => {
-          ${fields.join('\n')}
-        })
-        `
+        return { fields, name: tableName }
       }
     }
 
-    const inner = visit(parse(printSchemaWithDirectives(schema)), { leave: visitor }).definitions.filter(l => l).join('\n')
+    const inner = visit(parse(printSchemaWithDirectives(schema)), { leave: visitor }).definitions
+
     return `exports.up = async db => {
-      ${inner}
+      ${inner.map(({ fields, name }) => `
+        await db.schema.createTable('${name}', t => {
+          ${fields.join('\n')}
+          ${links[name] ? links[name].map(j => {
+    return `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`
+  }).join('\n') : ''}
+        })
+      `).join('\n')}
     }
 
     exports.down = async db => {

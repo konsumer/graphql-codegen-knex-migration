@@ -71,23 +71,32 @@ When you run `graphql-codegen`, you will get something that looks like this:
 
 ```js
 exports.up = async db => {
-  await db.schema.createTable('users', t => {
-    t.uuid('id').notNullable().primary()
-    t.string('email').notNull()
-    t.string('first_name').notNull()
-    t.string('last_name').notNull()
-  })
-  await db.schema.createTable('posts', t => {
-    t.uuid('id').notNullable().primary()
-    t.string('title').notNull()
-    t.string('body').notNull()
-    t.foreign('author').references('id').inTable('user');
-  })
-}
+  await db.schema.createTable("posts", t => {
+    t.uuid("id")
+      .notNull()
+      .primary();
+    t.string("title").notNull();
+    t.string("body").notNull();
+    t.uuid("author")
+      .index()
+      .references("id")
+      .inTable("users");
+  });
+
+  await db.schema.createTable("users", t => {
+    t.uuid("id")
+      .notNull()
+      .primary();
+    t.string("email").notNull();
+    t.string("first_name");
+    t.string("last_name");
+  });
+};
+
 exports.down = async db => {
-  await db.schema.dropTable('users')
-  await db.schema.dropTable('posts')
-}
+  await db.schema.dropTable("posts");
+  await db.schema.dropTable("users");
+};
 ```
 
 
