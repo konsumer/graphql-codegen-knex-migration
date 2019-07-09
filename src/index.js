@@ -57,10 +57,11 @@ module.exports = {
             const { name, array, required } = getField(f.type)
             if (typeMap[name]) {
               // regular scalar type
-              let out = `t.${typeMap[name]}('${underscore(f.name.value)}')`
+              let out
               if (array) {
                 out = `t.json('${underscore(f.name.value)}')`
               } else {
+                out = `t.${typeMap[name]}('${underscore(f.name.value)}')`
                 if (required) {
                   out += '.notNull()'
                 }
@@ -95,9 +96,7 @@ module.exports = {
       ${inner.map(({ fields, name }) => `
         await db.schema.createTable('${name}', t => {
           ${fields.join('\n')}
-          ${links[name] ? links[name].map(j => {
-    return `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`
-  }).join('\n') : ''}
+          ${links[name] ? links[name].map(j => `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`).join('\n') : ''}
         })
       `).join('\n')}
     }
