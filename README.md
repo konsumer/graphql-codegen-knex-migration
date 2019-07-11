@@ -4,7 +4,9 @@
 
 This will allow you to generate database migrations to setup [knex](https://knexjs.org/) with [graphql-code-generator](https://graphql-code-generator.com/).
 
-You can use this to create your data-store, and eventually I will have a resolver-generator, too that will work with it.
+You can use this with [graphql-codegen-knex-joinmonster](https://github.com/konsumer/graphql-codegen-knex-joinmonster) to create the join-monster meta info that matches this.
+
+To see a complete example project, checkout [graphql-codegen-knex-example](https://github.com/konsumer/graphql-codegen-knex-example)
 
 ## usage
 
@@ -140,8 +142,3 @@ You will need to make your own type-resolvers. I recommend [graphql-type-json](h
 Arrays of scalars will use JSON-type in the database.
 
 `ID` types will be stored as `UUID` in the database, to keep keys unique across tables.
-
-## development
-
-* You can install tools & deps with `npm i`
-* You can generate files in `migrations/` with `npm test`
