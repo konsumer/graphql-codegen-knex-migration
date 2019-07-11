@@ -59,7 +59,7 @@ module.exports = {
               // regular scalar type
               let out
               if (array) {
-                // no good way to handle scalar arrays, just use json
+                // TODO: no good way to handle scalar arrays, just use json
                 out = `t.json('${underscore(f.name.value)}')`
               } else {
                 out = `t.${typeMap[name]}('${underscore(f.name.value)}')`
@@ -88,7 +88,7 @@ module.exports = {
                   if (!array){
                     fields.push({ enum: true, name, array, required, field: f })
                   } else {
-                    // no good way to handle array enums, just use json
+                    // TODO: no good way to handle array enums, just use json
                     fields.push(`t.json('${underscore(f.name.value)}')`)
                   }
                 }
