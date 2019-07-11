@@ -26,6 +26,20 @@ You may want to add then to your own definitions, so your GraphQL doesn't throw 
 Use them like this:
 
 ```graphql
+type Post @db {
+  # the first ID! field is the default key, and will be `id` field in the database
+  id: ID!
+  
+  # this will be a a `title` field in the database
+  title: String!
+  
+  # this will be a a `body` field in the database
+  body: String!
+  
+  # because the other type is joined on this field, this will be where the database keeps references to `User.id`
+  author: User!
+}
+
 type User @db {
   # the first ID! field is the default key, and will be `id` field in the database
   id: ID!
@@ -44,20 +58,14 @@ type User @db {
 
   # if Post is also using @db, this will be a link between `User.id` and `Post.id` via the `Post.author` field
   posts: [ Post ]! @link(field: "author")
+
+  testEnum: TestEnum
 }
 
-type Post @db {
-  # the first ID! field is the default key, and will be `id` field in the database
-  id: ID!
-  
-  # this will be a a `title` field in the database
-  title: String!
-  
-  # this will be a a `body` field in the database
-  body: String!
-  
-  # because the other type is joined on this field, this will be where the database keeps references to `User.id`
-  author: User!
+enum TestEnum {
+  A
+  B
+  C
 }
 
 ```
@@ -97,6 +105,8 @@ exports.up = async db => {
     t.string("email").notNull();
     t.string("first_name");
     t.string("last_name");
+
+    t.enum("test_enum", ["A", "B", "C"]);
   });
 };
 
