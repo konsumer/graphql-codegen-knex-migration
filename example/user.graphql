@@ -16,4 +16,12 @@ type User @db {
 
   # if Post is also using @db, this will be a link between `User.id` and `Post.id` via the `Post.author` field
   posts: [ Post ]! @link(field: "author")
+
+  testEnum: TestEnum
+}
+
+enum TestEnum {
+  A
+  B
+  C
 }

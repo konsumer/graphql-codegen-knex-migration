@@ -33,6 +33,7 @@ module.exports = {
   plugin: (schema, documents, config) => {
     const tables = []
     const links = {}
+    const enums = {}
     const visitor = {
       ObjectTypeDefinition: node => {
         const tableName = tableize(underscore(node.name.value))
@@ -58,6 +59,7 @@ module.exports = {
               // regular scalar type
               let out
               if (array) {
+                // no good way to handle scalar arrays, just use json
                 out = `t.json('${underscore(f.name.value)}')`
               } else {
                 out = `t.${typeMap[name]}('${underscore(f.name.value)}')`
@@ -80,29 +82,52 @@ module.exports = {
                   links[tk] = []
                 }
                 links[tk].push({ link: directives.link, field: f, name: otherTable, array, required })
+              } else {
+                // no link, could be a connection to a type (other end) or an enum
+                if (schema._typeMap[name].astNode.kind === 'EnumTypeDefinition') {
+                  if (!array){
+                    fields.push({ enum: true, name, array, required, field: f })
+                  } else {
+                    // no good way to handle array enums, just use json
+                    fields.push(`t.json('${underscore(f.name.value)}')`)
+                  }
+                }
               }
             }
           }
         })
         return { fields, name: tableName }
+      },
+
+      // just add enums to dict for later lookup
+      EnumTypeDefinition: node => {
+        enums[ node.name.value ] = node.values.map(v => v.name.value)
+        return node
       }
     }
 
     const inner = visit(parse(printSchemaWithDirectives(schema)), { leave: visitor }).definitions
 
     return `exports.up = async db => {
-      ${inner.map(({ fields, name }) => `
-        await db.schema.createTable('${name}', t => {
-          ${fields.join('\n')}
-          ${links[name] ? links[name].map(j => `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`).join('\n') : ''}
-        })
-      `).join('\n')}
-    }
-
-    exports.down = async db => {
-      ${tables.map(t => `await db.schema.dropTable('${tableize(underscore(t))}')`).join('\n')}
-    }
-    `
+       ${inner.filter(t => t.kind !== 'EnumTypeDefinition').map(({ fields, name }) => `
+         await db.schema.createTable('${name}', t => {
+           ${fields.filter(f => !f.enum).join('\n')}
+           ${links[name] ? links[name].map(j => `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`).join('\n') : ''}
+           ${fields.filter(f => !!f.enum).map(({ name, field, required }) => {
+              let out = `t.enum('${underscore(field.name.value)}', ${JSON.stringify(enums[name])})`
+              if (required){
+                out += '.notNull()'
+              }
+              return out
+            }).join('\n')}
+         })
+       `).join('\n')}
+     }
+ 
+     exports.down = async db => {
+       ${tables.map(t => `await db.schema.dropTable('${tableize(underscore(t))}')`).join('\n')}
+     }
+     `
   },
   addToSchema: `
     directive @db on OBJECT
