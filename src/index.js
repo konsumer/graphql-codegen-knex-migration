@@ -107,9 +107,9 @@ module.exports = {
     }
 
     const inner = visit(parse(printSchemaWithDirectives(schema)), { leave: visitor }).definitions
-
+  
     return `exports.up = async db => {
-       ${inner.filter(t => t.kind !== 'EnumTypeDefinition').map(({ fields, name }) => `
+       ${inner.filter(t => t.kind !== 'EnumTypeDefinition' && t.kind !== 'ScalarTypeDefinition').map(({ fields, name }) => `
          await db.schema.createTable('${name}', t => {
            ${fields.filter(f => !f.enum).join('\n')}
            ${links[name] ? links[name].map(j => `t.uuid('${underscore(j.link.field)}').index().references('id').inTable('${j.name}')`).join('\n') : ''}
